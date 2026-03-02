@@ -40,6 +40,7 @@ RUN set -eux; \
     clone_if_missing https://github.com/kijai/ComfyUI-KJNodes "${COMFYUI_DIR}/custom_nodes/ComfyUI-KJNodes"; \
     clone_if_missing https://github.com/Fannovel16/comfyui_controlnet_aux "${COMFYUI_DIR}/custom_nodes/comfyui_controlnet_aux"; \
     clone_if_missing https://github.com/storyicon/comfyui_segment_anything "${COMFYUI_DIR}/custom_nodes/comfyui_segment_anything"; \
+    clone_if_missing https://github.com/AtlasCloudAI/atlascloud_comfyui "${COMFYUI_DIR}/custom_nodes/atlascloud_comfyui"; \
     "${COMFYUI_VENV_PYTHON}" -c "import os; from pathlib import Path; path = Path(os.environ.get('COMFYUI_DIR', '/opt/ComfyUI')) / 'custom_nodes/ComfyUI-Impact-Pack/modules/impact/core.py'; text = path.read_text(encoding='utf-8') if path.is_file() else None; old = 'def get_schedulers():\\n    return list(comfy.samplers.SCHEDULER_HANDLERS) + ADDITIONAL_SCHEDULERS\\n'; new = 'def get_schedulers():\\n    handlers = getattr(comfy.samplers, \\'SCHEDULER_HANDLERS\\', None)\\n    if handlers is None:\\n        names = getattr(comfy.samplers, \\'SCHEDULER_NAMES\\', [])\\n        return list(names) + ADDITIONAL_SCHEDULERS\\n    return list(handlers) + ADDITIONAL_SCHEDULERS\\n'; (text is not None and old in text) and path.write_text(text.replace(old, new), encoding='utf-8')"; \
     for req in \
       "${COMFYUI_DIR}/custom_nodes/ComfyUI-Impact-Pack/requirements.txt" \
@@ -54,7 +55,8 @@ RUN set -eux; \
       "${COMFYUI_DIR}/custom_nodes/ComfyUI-VideoHelperSuite/requirements.txt" \
       "${COMFYUI_DIR}/custom_nodes/ComfyUI-KJNodes/requirements.txt" \
       "${COMFYUI_DIR}/custom_nodes/comfyui_controlnet_aux/requirements.txt" \
-      "${COMFYUI_DIR}/custom_nodes/comfyui_segment_anything/requirements.txt"; do \
+      "${COMFYUI_DIR}/custom_nodes/comfyui_segment_anything/requirements.txt" \
+      "${COMFYUI_DIR}/custom_nodes/atlascloud_comfyui/requirements.txt"; do \
       if [ -f "$req" ]; then "${COMFYUI_VENV_PIP}" install --no-cache-dir -r "$req"; fi; \
     done; \
     TORCH_VERSION="$("${COMFYUI_VENV_PYTHON}" -c "import torch; print(torch.__version__)")"; \
